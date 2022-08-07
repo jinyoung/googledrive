@@ -58,7 +58,7 @@
     const axios = require('axios').default;
 
     export default {
-        name: 'FilePicker',
+        name: 'DriveFilePicker',
         props: {
             value: [String, Object, Array, Number, Boolean],
         },
@@ -68,14 +68,14 @@
         }),
         async created() {
             var me = this;
-            var temp = await axios.get(axios.fixUrl('/files'))
+            var temp = await axios.get(axios.fixUrl('/driveFiles'))
             if(temp.data) {
-                me.list = temp.data._embedded.files;
+                me.list = temp.data._embedded.driveFiles;
             }
 
             if(me.value && typeof me.value == "object" && Object.values(me.value)[0]) {
                 var id = Object.values(me.value)[0];
-                var tmpValue = await axios.get(axios.fixUrl('/files/' + id))
+                var tmpValue = await axios.get(axios.fixUrl('/driveFiles/' + id))
                 if(tmpValue.data) {
                     var val = tmpValue.data
                     me.list.forEach(function(item, idx) {

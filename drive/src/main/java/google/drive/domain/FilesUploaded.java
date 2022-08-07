@@ -18,7 +18,7 @@ public class FilesUploaded extends AbstractEvent {
     private String fileType;
     private String uploadStatus;
 
-    public FilesUploaded(File aggregate) {
+    public FilesUploaded(DriveFile aggregate) {
         super(aggregate);
     }
 

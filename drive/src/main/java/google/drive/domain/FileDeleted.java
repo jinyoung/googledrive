@@ -12,7 +12,7 @@ public class FileDeleted extends AbstractEvent {
     private Long id;
     private String userId;
 
-    public FileDeleted(File aggregate) {
+    public FileDeleted(DriveFile aggregate) {
         super(aggregate);
     }
 

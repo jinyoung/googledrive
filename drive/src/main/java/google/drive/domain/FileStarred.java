@@ -18,9 +18,8 @@ public class FileStarred extends AbstractEvent {
     private String fileType;
     private String uploadStatus;
     private Date regDate;
-    private Boolean starred;
 
-    public FileStarred(File aggregate) {
+    public FileStarred(DriveFile aggregate) {
         super(aggregate);
     }
 

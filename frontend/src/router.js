@@ -8,8 +8,8 @@ Vue.use(Router);
 
 import FileInfoView from "./components/FileInfoView"
 import FileInfoViewDetail from "./components/FileInfoViewDetail"
-import FileManager from "./components/listers/FileCards"
-import FileDetail from "./components/listers/FileDetail"
+import DriveFileManager from "./components/listers/DriveFileCards"
+import DriveFileDetail from "./components/listers/DriveFileDetail"
 
 import IndexManager from "./components/listers/IndexCards"
 import IndexDetail from "./components/listers/IndexDetail"
@@ -35,14 +35,14 @@ export default new Router({
                 component: FileInfoViewDetail
             },
             {
-                path: '/files',
-                name: 'FileManager',
-                component: FileManager
+                path: '/driveFiles',
+                name: 'DriveFileManager',
+                component: DriveFileManager
             },
             {
-                path: '/files/:id',
-                name: 'FileDetail',
-                component: FileDetail
+                path: '/driveFiles/:id',
+                name: 'DriveFileDetail',
+                component: DriveFileDetail
             },
 
             {

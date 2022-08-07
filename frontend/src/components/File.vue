@@ -1,237 +1,87 @@
 <template>
 
-    <v-card style="width:450px;" outlined>
-        <template slot="progress">
-            <v-progress-linear
-                    color="deep-purple"
-                    height="10"
-                    indeterminate
-            ></v-progress-linear>
-        </template>
-
-        <v-card-title v-if="value._links">
-            File # {{value._links.self.href.split("/")[value._links.self.href.split("/").length - 1]}}
-        </v-card-title >
-        <v-card-title v-else>
+    <v-card outlined>
+        <v-card-title>
             File
-        </v-card-title >
+        </v-card-title>
 
         <v-card-text>
-            <String label="Filename" v-model="value.filename" :editMode="editMode"/>
-            <String label="UserId" v-model="value.userId" :editMode="editMode"/>
-            <String label="FileUrl" v-model="value.fileUrl" :editMode="editMode"/>
-            <String label="FileSize" v-model="value.fileSize" :editMode="editMode"/>
-            <String label="FileType" v-model="value.fileType" :editMode="editMode"/>
-            <String label="UploadStatus" v-model="value.uploadStatus" :editMode="editMode"/>
-            <Date label="RegDate" v-model="value.regDate" :editMode="editMode"/>
-            <Boolean label="Starred" v-model="value.starred" :editMode="editMode"/>
-            <File offline label="File" v-model="value.file" :editMode="editMode" @change="change"/>
+            <LargeObject label="FileName" v-model="value.fileName" :editMode="editMode"/>
+            <LargeObject label="File" v-model="value.file" :editMode="editMode"/>
         </v-card-text>
 
-        <v-card-actions>
-            <v-spacer></v-spacer>
-            <v-btn
-                    color="deep-purple lighten-2"
-                    text
-                    @click="edit"
-                    v-if="!editMode"
-            >
-                Edit
-            </v-btn>
-            <v-btn
-                    color="deep-purple lighten-2"
-                    text
-                    @click="save"
-                    v-else
-            >
-                Save
-            </v-btn>
-            <v-btn
-                    color="deep-purple lighten-2"
-                    text
-                    @click="remove"
-                    v-if="!editMode"
-            >
-                Delete
-            </v-btn>
-            <v-btn
-                    color="deep-purple lighten-2"
-                    text
-                    @click="editMode = false"
-                    v-if="editMode && !isNew"
-            >
-                Cancel
-            </v-btn>
+        <v-card-actions v-if="inList">
+            <slot name="actions"></slot>
         </v-card-actions>
-        <v-card-actions>
-            <v-spacer></v-spacer>                        
-            <v-btn
-                    v-if="!editMode"
-                    color="deep-purple lighten-2"
-                    text
-                    @click="upload"
-            >
-                Upload
-            </v-btn>
-            <v-btn
-                    v-if="!editMode"
-                    color="deep-purple lighten-2"
-                    text
-                    @click="star"
-            >
-                Star
-            </v-btn>
-        </v-card-actions>
-
-        <v-snackbar
-                v-model="snackbar.status"
-                :top="true"
-                :timeout="snackbar.timeout"
-                color="error"
-        >
-            {{ snackbar.text }}
-            <v-btn dark text @click="snackbar.status = false">
-                Close
-            </v-btn>
-        </v-snackbar>
     </v-card>
-
 </template>
 
 <script>
-    const axios = require('axios').default;
-
 
     export default {
         name: 'File',
-        components:{
-        },
+        components:{},
         props: {
             value: [Object, String, Number, Boolean, Array],
             editMode: Boolean,
             isNew: Boolean,
             offline: Boolean,
+            inList: Boolean,
+            label: String,
         },
         data: () => ({
-            snackbar: {
-                status: false,
-                timeout: 5000,
-                text: ''
-            },
         }),
-        created(){
-        },
-        methods: {
-            selectFile(){
-                if(this.editMode == false) {
-                    return false;
+        async created() {
+            if(!Object.values(this.value)[0]) {
+                this.$emit('input', {});
+                this.newValue = {
+                    'fileName': '',
+                    'file': '',
                 }
-                var me = this
-                var input = document.createElement("input");
-                input.type = "file";
-                input.accept = "image/*";
-                input.id = "uploadInput";
-                
-                input.click();
-                input.onchange = function (event) {
-                    var file = event.target.files[0]
-                    var reader = new FileReader();
-
-                    reader.onload = function () {
-                        var result = reader.result;
-                        me.imageUrl = result;
-                        me.value.photo = result;
-                        
-                    };
-                    reader.readAsDataURL( file );
-                };
+            }
+            if(typeof this.value === 'object') {
+                if(!('fileName' in this.value)) {
+                    this.value.fileName = '';
+                }
+                if(!('file' in this.value)) {
+                    this.value.file = '';
+                }
+            }
+        },
+        watch: {
+            value(val) {
+                this.$emit('input', val);
             },
+            newValue(val) {
+                this.$emit('input', val);
+            },
+        },
+
+        methods: {
             edit() {
                 this.editMode = true;
             },
-            async save(){
-                try {
-                    var temp = null;
+            async add() {
+                this.editMode = false;
+                this.$emit('input', this.value);
 
-                    if(!this.offline) {
-                        if(this.isNew) {
-                            temp = await axios.post(axios.fixUrl('/files'), this.value)
-                        } else {
-                            temp = await axios.put(axios.fixUrl(this.value._links.self.href), this.value)
-                        }
-                    }
-
-                    if(this.value!=null) {
-                        for(var k in temp.data) this.value[k]=temp.data[k];
-                    } else {
-                        this.value = temp.data;
-                    }
-
-                    this.editMode = false;
-                    this.$emit('input', this.value);
-
-                    if (this.isNew) {
-                        this.$emit('add', this.value);
-                    } else {
-                        this.$emit('edit', this.value);
-                    }
-
-                    location.reload()
-
-                } catch(e) {
-                    this.snackbar.status = true
-                    if(e.response.data.message) {
-                        this.snackbar.text = e.response.data.message
-                    } else {
-                        this.snackbar.text = e
-                    }
+                if(this.isNew){
+                    this.$emit('add', this.value);
+                } else {
+                    this.$emit('edit', this.value);
                 }
-                
             },
             async remove(){
-                try {
-                    if (!this.offline) {
-                        await axios.delete(axios.fixUrl(this.value._links.self.href))
-                    }
+                this.editMode = false;
+                this.isDeleted = true;
 
-                    this.editMode = false;
-                    this.isDeleted = true;
-
-                    this.$emit('input', this.value);
-                    this.$emit('delete', this.value);
-
-                } catch(e) {
-                    this.snackbar.status = true
-                    if(e.response.data.message) {
-                        this.snackbar.text = e.response.data.message
-                    } else {
-                        this.snackbar.text = e
-                    }
-                }
+                this.$emit('input', this.value);
+                this.$emit('delete', this.value);
             },
             change(){
-                this.$emit('input', this.value);
+                this.$emit('change', this.value);
             },
-            async star() {
-                try {
-                    if(!this.offline) {
-                        var temp = await axios.put(axios.fixUrl(this.value._links.star.href))
-                        for(var k in temp.data) {
-                            this.value[k]=temp.data[k];
-                        }
-                    }
-
-                    this.editMode = false;
-                } catch(e) {
-                    this.snackbar.status = true
-                    if(e.response.data.message) {
-                        this.snackbar.text = e.response.data.message
-                    } else {
-                        this.snackbar.text = e
-                    }
-                }
-            },
-        },
+        }
     }
 </script>
 

@@ -7,11 +7,11 @@ import org.springframework.hateoas.server.RepresentationModelProcessor;
 import org.springframework.stereotype.Component;
 
 @Component
-public class FileHateoasProcessor
-    implements RepresentationModelProcessor<EntityModel<File>> {
+public class DriveFileHateoasProcessor
+    implements RepresentationModelProcessor<EntityModel<DriveFile>> {
 
     @Override
-    public EntityModel<File> process(EntityModel<File> model) {
+    public EntityModel<DriveFile> process(EntityModel<DriveFile> model) {
         model.add(
             Link.of(model.getRequiredLink("self").getHref() + "/").withRel("")
         );

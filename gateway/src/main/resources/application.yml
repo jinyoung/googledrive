@@ -11,23 +11,23 @@ spring:
         - id: dashboard
           uri: http://localhost:8081
           predicates:
-            - Path= 
+            - Path=, /fileInfos/**
         - id: drive
           uri: http://localhost:8082
           predicates:
-            - Path=/files/** 
+            - Path=/driveFiles/**, 
         - id: indexer
           uri: http://localhost:8083
           predicates:
-            - Path=/indices/** 
+            - Path=/indices/**, 
         - id: videoprocessing
           uri: http://localhost:8084
           predicates:
-            - Path=/videos/** 
+            - Path=/videos/**, 
         - id: noti
           uri: http://localhost:8085
           predicates:
-            - Path= 
+            - Path=, 
         - id: frontend
           uri: http://localhost:8080
           predicates:
@@ -54,23 +54,23 @@ spring:
         - id: dashboard
           uri: http://dashboard:8080
           predicates:
-            - Path= 
+            - Path=, /fileInfos/**
         - id: drive
           uri: http://drive:8080
           predicates:
-            - Path=/files/** 
+            - Path=/driveFiles/**, 
         - id: indexer
           uri: http://indexer:8080
           predicates:
-            - Path=/indices/** 
+            - Path=/indices/**, 
         - id: videoprocessing
           uri: http://videoprocessing:8080
           predicates:
-            - Path=/videos/** 
+            - Path=/videos/**, 
         - id: noti
           uri: http://noti:8080
           predicates:
-            - Path= 
+            - Path=, 
         - id: frontend
           uri: http://frontend:8080
           predicates:
