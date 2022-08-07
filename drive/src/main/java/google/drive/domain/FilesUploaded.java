@@ -2,8 +2,11 @@ package google.drive.domain;
 
 import google.drive.domain.*;
 import google.drive.infra.AbstractEvent;
-import java.util.Date;
+import java.util.*;
+import lombok.*;
 
+@Data
+@ToString
 public class FilesUploaded extends AbstractEvent {
 
     private Long id;
@@ -15,71 +18,13 @@ public class FilesUploaded extends AbstractEvent {
     private String fileType;
     private String uploadStatus;
 
+    public FilesUploaded(File aggregate) {
+        super(aggregate);
+    }
+
     public FilesUploaded() {
         super();
     }
+    // keep
 
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getFilename() {
-        return filename;
-    }
-
-    public void setFilename(String filename) {
-        this.filename = filename;
-    }
-
-    public String getUserId() {
-        return userId;
-    }
-
-    public void setUserId(String userId) {
-        this.userId = userId;
-    }
-
-    public String getFile() {
-        return file;
-    }
-
-    public void setFile(String file) {
-        this.file = file;
-    }
-
-    public String getFileUrl() {
-        return fileUrl;
-    }
-
-    public void setFileUrl(String fileUrl) {
-        this.fileUrl = fileUrl;
-    }
-
-    public String getFileSize() {
-        return fileSize;
-    }
-
-    public void setFileSize(String fileSize) {
-        this.fileSize = fileSize;
-    }
-
-    public String getFileType() {
-        return fileType;
-    }
-
-    public void setFileType(String fileType) {
-        this.fileType = fileType;
-    }
-
-    public String getUploadStatus() {
-        return uploadStatus;
-    }
-
-    public void setUploadStatus(String uploadStatus) {
-        this.uploadStatus = uploadStatus;
-    }
 }

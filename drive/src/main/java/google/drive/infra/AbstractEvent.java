@@ -4,8 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import google.drive.DriveApplication;
 import google.drive.config.kafka.KafkaProcessor;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import org.springframework.beans.BeanUtils;
 import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.MessageHeaders;
 import org.springframework.messaging.support.MessageBuilder;
@@ -18,50 +17,35 @@ public class AbstractEvent {
     String eventType;
     Long timestamp;
 
+    public AbstractEvent(Object aggregate) {
+        this();
+        BeanUtils.copyProperties(aggregate, this);
+    }
+
     public AbstractEvent() {
         this.setEventType(this.getClass().getSimpleName());
-        // SimpleDateFormat defaultSimpleDateFormat = new SimpleDateFormat("YYYYMMddHHmmss");
-        // this.timestamp = defaultSimpleDateFormat.format(new Date());
         this.timestamp = System.currentTimeMillis();
     }
 
-    public String toJson() {
-        ObjectMapper objectMapper = new ObjectMapper();
-        String json = null;
-
-        try {
-            json = objectMapper.writeValueAsString(this);
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException("JSON format exception", e);
-        }
-
-        return json;
-    }
-
-    public void publish(String json) {
-        if (json != null) {
-            /**
-             * spring streams 방식
-             */
-            KafkaProcessor processor = DriveApplication.applicationContext.getBean(
-                KafkaProcessor.class
-            );
-            MessageChannel outputChannel = processor.outboundTopic();
-
-            outputChannel.send(
-                MessageBuilder
-                    .withPayload(json)
-                    .setHeader(
-                        MessageHeaders.CONTENT_TYPE,
-                        MimeTypeUtils.APPLICATION_JSON
-                    )
-                    .build()
-            );
-        }
-    }
-
     public void publish() {
-        this.publish(this.toJson());
+        /**
+         * spring streams 방식
+         */
+        KafkaProcessor processor = DriveApplication.applicationContext.getBean(
+            KafkaProcessor.class
+        );
+        MessageChannel outputChannel = processor.outboundTopic();
+
+        outputChannel.send(
+            MessageBuilder
+                .withPayload(this)
+                .setHeader(
+                    MessageHeaders.CONTENT_TYPE,
+                    MimeTypeUtils.APPLICATION_JSON
+                )
+                .setHeader("type", getEventType())
+                .build()
+        );
     }
 
     public void publishAfterCommit() {
@@ -94,4 +78,6 @@ public class AbstractEvent {
     public boolean validate() {
         return getEventType().equals(getClass().getSimpleName());
     }
+    // keep
+
 }

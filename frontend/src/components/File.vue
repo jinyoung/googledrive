@@ -1,259 +1,237 @@
 <template>
 
-<v-card style="width:300px; margin-left:5%;" outlined>
-    <template slot="progress">
-      <v-progress-linear
-        color="deep-purple"
-        height="10"
-        indeterminate
-      ></v-progress-linear>
-    </template>
+    <v-card style="width:450px;" outlined>
+        <template slot="progress">
+            <v-progress-linear
+                    color="deep-purple"
+                    height="10"
+                    indeterminate
+            ></v-progress-linear>
+        </template>
 
-    <v-img
-      style="width:290px; height:150px; border-radius:10px; position:relative; margin-left:5px; top:5px;"
-      src="https://cdn.vuetifyjs.com/images/cards/cooking.png"
-    ></v-img>
+        <v-card-title v-if="value._links">
+            File # {{value._links.self.href.split("/")[value._links.self.href.split("/").length - 1]}}
+        </v-card-title >
+        <v-card-title v-else>
+            File
+        </v-card-title >
 
-    <v-card-title v-if="value._links">
-        File # {{value._links.self.href.split("/")[value._links.self.href.split("/").length - 1]}}
-    </v-card-title >
-    <v-card-title v-else>
-        File
-    </v-card-title >
+        <v-card-text>
+            <String label="Filename" v-model="value.filename" :editMode="editMode"/>
+            <String label="UserId" v-model="value.userId" :editMode="editMode"/>
+            <String label="FileUrl" v-model="value.fileUrl" :editMode="editMode"/>
+            <String label="FileSize" v-model="value.fileSize" :editMode="editMode"/>
+            <String label="FileType" v-model="value.fileType" :editMode="editMode"/>
+            <String label="UploadStatus" v-model="value.uploadStatus" :editMode="editMode"/>
+            <Date label="RegDate" v-model="value.regDate" :editMode="editMode"/>
+            <Boolean label="Starred" v-model="value.starred" :editMode="editMode"/>
+            <File offline label="File" v-model="value.file" :editMode="editMode" @change="change"/>
+        </v-card-text>
 
-    <v-card-text style = "margin-left:-15px; margin-top:10px;">
-
-          <div class="grey--text ml-4" v-if="editMode" style = "margin-top:-20px;">
-            <v-text-field label="Filename" v-model="value.filename"/>
-          </div>
-          <div class="grey--text ml-4" v-else>
-            Filename :  {{value.filename }}
-          </div>
-
-
-          <div class="grey--text ml-4" v-if="editMode" style = "margin-top:-20px;">
-            <v-text-field label="UserId" v-model="value.userId"/>
-          </div>
-          <div class="grey--text ml-4" v-else>
-            UserId :  {{value.userId }}
-          </div>
-
-
-          <div class="grey--text ml-4" v-if="editMode" style = "margin-top:-20px;">
-            <v-text-field label="FileUrl" v-model="value.fileUrl"/>
-          </div>
-          <div class="grey--text ml-4" v-else>
-            FileUrl :  {{value.fileUrl }}
-          </div>
-
-
-          <div class="grey--text ml-4" v-if="editMode" style = "margin-top:-20px;">
-            <v-text-field label="FileSize" v-model="value.fileSize"/>
-          </div>
-          <div class="grey--text ml-4" v-else>
-            FileSize :  {{value.fileSize }}
-          </div>
-
-
-          <div class="grey--text ml-4" v-if="editMode" style = "margin-top:-20px;">
-            <v-text-field label="FileType" v-model="value.fileType"/>
-          </div>
-          <div class="grey--text ml-4" v-else>
-            FileType :  {{value.fileType }}
-          </div>
-
-
-          <div class="grey--text ml-4" v-if="editMode" style = "margin-top:-20px;">
-            <v-text-field label="UploadStatus" v-model="value.uploadStatus"/>
-          </div>
-          <div class="grey--text ml-4" v-else>
-            UploadStatus :  {{value.uploadStatus }}
-          </div>
-
-
-          <div class="grey--text ml-4" v-if="editMode" style = "margin-top:-20px;">
-            <v-menu
-                v-model="menu"
-                width="290px"
+        <v-card-actions>
+            <v-spacer></v-spacer>
+            <v-btn
+                    color="deep-purple lighten-2"
+                    text
+                    @click="edit"
+                    v-if="!editMode"
             >
-                <template v-slot:activator="{ on, attrs }">
-                <v-text-field
-                    v-model="value.regDate"
-                    label="RegDate"
-                    prepend-icon="mdi-calendar"
-                    readonly
-                    v-bind="attrs"
-                    v-on="on"
-                ></v-text-field>
-                </template>
-                <v-date-picker
-                v-model="value.regDate"
-                :min="new Date().toISOString().substr(0, 10)"
-                @input="menu = false"
-                ></v-date-picker>
-            </v-menu>
-          </div>
-          <div class="grey--text ml-4" v-else>
-            RegDate :  {{value.regDate }}
-          </div>
-
-          <div class="grey--text ml-4" v-if="editMode" style = "margin-top:-20px;">
-
-            <v-radio-group
-              v-model="value.starred"
-              row
+                Edit
+            </v-btn>
+            <v-btn
+                    color="deep-purple lighten-2"
+                    text
+                    @click="save"
+                    v-else
             >
-                <template v-slot:label>
-                    <div>starred</div>
-                </template>
-              <v-radio
-                label="Y"
-                value="true"
-              ></v-radio>
-              <v-radio
-                label="N"
-                value="false"
-              ></v-radio>
-            </v-radio-group>
-          </div>
-          <div class="grey--text ml-4" v-else>
-            Starred :  {{value.starred }}
-          </div>
+                Save
+            </v-btn>
+            <v-btn
+                    color="deep-purple lighten-2"
+                    text
+                    @click="remove"
+                    v-if="!editMode"
+            >
+                Delete
+            </v-btn>
+            <v-btn
+                    color="deep-purple lighten-2"
+                    text
+                    @click="editMode = false"
+                    v-if="editMode && !isNew"
+            >
+                Cancel
+            </v-btn>
+        </v-card-actions>
+        <v-card-actions>
+            <v-spacer></v-spacer>                        
+            <v-btn
+                    v-if="!editMode"
+                    color="deep-purple lighten-2"
+                    text
+                    @click="upload"
+            >
+                Upload
+            </v-btn>
+            <v-btn
+                    v-if="!editMode"
+                    color="deep-purple lighten-2"
+                    text
+                    @click="star"
+            >
+                Star
+            </v-btn>
+        </v-card-actions>
 
-
-
-    </v-card-text>
-
-    <v-divider class="mx-4"></v-divider>
-
-    <v-card-actions style = "position:absolute; right:0; bottom:0;">
-      <v-btn
-        color="deep-purple lighten-2"
-        text
-        @click="edit"
-        v-if="!editMode"
-      >
-        Edit
-      </v-btn>
-      <v-btn
-        color="deep-purple lighten-2"
-        text
-        @click="save"
-        v-else
-      >
-        Save
-      </v-btn>
-      <v-btn
-        color="deep-purple lighten-2"
-        text
-        @click="remove"
-        v-if="!editMode"
-      >
-        Delete
-      </v-btn>
-      
-      <v-btn
-        color="deep-purple lighten-2"
-        text
-        @click="upload"
-        v-if="!editMode"
-      >
-        Upload
-      </v-btn>
-      <v-btn
-        color="deep-purple lighten-2"
-        text
-        @click="star"
-        v-if="!editMode"
-      >
-        Star
-      </v-btn>
-    </v-card-actions>
-  </v-card>
-
+        <v-snackbar
+                v-model="snackbar.status"
+                :top="true"
+                :timeout="snackbar.timeout"
+                color="error"
+        >
+            {{ snackbar.text }}
+            <v-btn dark text @click="snackbar.status = false">
+                Close
+            </v-btn>
+        </v-snackbar>
+    </v-card>
 
 </template>
 
 <script>
-  const axios = require('axios').default;
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  export default {
-    name: 'File',
-    components:{
-    },
-    props: {
-      value: Object,
-      editMode: Boolean,
-      isNew: Boolean
-    },
-    data: () => ({
-        date: new Date().toISOString().substr(0, 10),
-    }),
-    created(){
-    },
+    const axios = require('axios').default;
 
-    methods: {
-      edit(){
-        this.editMode = true;
-      },
-      async save(){
-        try{
-          var temp = null;
-          if(this.isNew){
-            temp = await axios.post(axios.fixUrl('/files'), this.value)
-          }else{
-            temp = await axios.put(axios.fixUrl(this.value._links.self.href), this.value)
-          }
 
-          this.value = temp.data;
+    export default {
+        name: 'File',
+        components:{
+        },
+        props: {
+            value: [Object, String, Number, Boolean, Array],
+            editMode: Boolean,
+            isNew: Boolean,
+            offline: Boolean,
+        },
+        data: () => ({
+            snackbar: {
+                status: false,
+                timeout: 5000,
+                text: ''
+            },
+        }),
+        created(){
+        },
+        methods: {
+            selectFile(){
+                if(this.editMode == false) {
+                    return false;
+                }
+                var me = this
+                var input = document.createElement("input");
+                input.type = "file";
+                input.accept = "image/*";
+                input.id = "uploadInput";
+                
+                input.click();
+                input.onchange = function (event) {
+                    var file = event.target.files[0]
+                    var reader = new FileReader();
 
-          this.editMode = false;
-          this.$emit('input', this.value);
+                    reader.onload = function () {
+                        var result = reader.result;
+                        me.imageUrl = result;
+                        me.value.photo = result;
+                        
+                    };
+                    reader.readAsDataURL( file );
+                };
+            },
+            edit() {
+                this.editMode = true;
+            },
+            async save(){
+                try {
+                    var temp = null;
 
-          if(this.isNew){
-            this.$emit('add', this.value);
-          }else{
-            this.$emit('edit', this.value);
-          }
+                    if(!this.offline) {
+                        if(this.isNew) {
+                            temp = await axios.post(axios.fixUrl('/files'), this.value)
+                        } else {
+                            temp = await axios.put(axios.fixUrl(this.value._links.self.href), this.value)
+                        }
+                    }
 
-        }catch(e){
-          alert(e.message)
-        }
-      },
-      async remove(){
-        try{
-          await axios.delete(axios.fixUrl(this.value._links.self.href))
-          this.editMode = false;
-          this.isDeleted = true;
+                    if(this.value!=null) {
+                        for(var k in temp.data) this.value[k]=temp.data[k];
+                    } else {
+                        this.value = temp.data;
+                    }
 
-          this.$emit('input', this.value);
-          this.$emit('delete', this.value);
+                    this.editMode = false;
+                    this.$emit('input', this.value);
 
-        }catch(e){
-          alert(e.message)
-        }
-      },
-      
-      async star(){
-        try{
-          var temp = await axios.put(axios.fixUrl(this.value._links.star.href))
-          this.value = temp.data;
-          this.editMode = false;
-        }catch(e){
-          alert(e.message)
-        }
-      },
-      
-    },
-  }
+                    if (this.isNew) {
+                        this.$emit('add', this.value);
+                    } else {
+                        this.$emit('edit', this.value);
+                    }
+
+                    location.reload()
+
+                } catch(e) {
+                    this.snackbar.status = true
+                    if(e.response.data.message) {
+                        this.snackbar.text = e.response.data.message
+                    } else {
+                        this.snackbar.text = e
+                    }
+                }
+                
+            },
+            async remove(){
+                try {
+                    if (!this.offline) {
+                        await axios.delete(axios.fixUrl(this.value._links.self.href))
+                    }
+
+                    this.editMode = false;
+                    this.isDeleted = true;
+
+                    this.$emit('input', this.value);
+                    this.$emit('delete', this.value);
+
+                } catch(e) {
+                    this.snackbar.status = true
+                    if(e.response.data.message) {
+                        this.snackbar.text = e.response.data.message
+                    } else {
+                        this.snackbar.text = e
+                    }
+                }
+            },
+            change(){
+                this.$emit('input', this.value);
+            },
+            async star() {
+                try {
+                    if(!this.offline) {
+                        var temp = await axios.put(axios.fixUrl(this.value._links.star.href))
+                        for(var k in temp.data) {
+                            this.value[k]=temp.data[k];
+                        }
+                    }
+
+                    this.editMode = false;
+                } catch(e) {
+                    this.snackbar.status = true
+                    if(e.response.data.message) {
+                        this.snackbar.text = e.response.data.message
+                    } else {
+                        this.snackbar.text = e
+                    }
+                }
+            },
+        },
+    }
 </script>
 

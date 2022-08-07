@@ -2,30 +2,23 @@ package google.drive.domain;
 
 import google.drive.domain.*;
 import google.drive.infra.AbstractEvent;
-import java.util.Date;
+import java.util.*;
+import lombok.*;
 
+@Data
+@ToString
 public class FileDeleted extends AbstractEvent {
 
     private Long id;
     private String userId;
 
+    public FileDeleted(File aggregate) {
+        super(aggregate);
+    }
+
     public FileDeleted() {
         super();
     }
+    // keep
 
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getUserId() {
-        return userId;
-    }
-
-    public void setUserId(String userId) {
-        this.userId = userId;
-    }
 }

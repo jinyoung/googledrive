@@ -7,10 +7,11 @@ import google.drive.domain.FilesUploaded;
 import java.util.Date;
 import java.util.List;
 import javax.persistence.*;
-import org.springframework.beans.BeanUtils;
+import lombok.Data;
 
 @Entity
 @Table(name = "File_table")
+@Data
 public class File {
 
     @Id
@@ -33,108 +34,38 @@ public class File {
 
     private Boolean starred;
 
+    @Embedded
     private File file;
 
     @PostPersist
     public void onPostPersist() {
-        FilesUploaded filesUploaded = new FilesUploaded();
-        BeanUtils.copyProperties(this, filesUploaded);
+        FilesUploaded filesUploaded = new FilesUploaded(this);
         filesUploaded.publishAfterCommit();
     }
 
     @PostUpdate
     public void onPostUpdate() {
-        FileStarred fileStarred = new FileStarred();
-        BeanUtils.copyProperties(this, fileStarred);
+        FileStarred fileStarred = new FileStarred(this);
         fileStarred.publishAfterCommit();
     }
 
     @PostRemove
     public void onPostRemove() {
-        FileDeleted fileDeleted = new FileDeleted();
-        BeanUtils.copyProperties(this, fileDeleted);
+        FileDeleted fileDeleted = new FileDeleted(this);
         fileDeleted.publishAfterCommit();
     }
 
-    public Long getId() {
-        return id;
+    public static FileRepository repository() {
+        FileRepository fileRepository = DriveApplication.applicationContext.getBean(
+            FileRepository.class
+        );
+        return fileRepository;
     }
 
-    public void setId(Long id) {
-        this.id = id;
-    }
+    public void upload() {}
 
-    public String getFilename() {
-        return filename;
+    public void star() {
+        FileStarred fileStarred = new FileStarred(this);
+        fileStarred.publishAfterCommit();
     }
-
-    public void setFilename(String filename) {
-        this.filename = filename;
-    }
-
-    public String getUserId() {
-        return userId;
-    }
-
-    public void setUserId(String userId) {
-        this.userId = userId;
-    }
-
-    public String getFileUrl() {
-        return fileUrl;
-    }
-
-    public void setFileUrl(String fileUrl) {
-        this.fileUrl = fileUrl;
-    }
-
-    public String getFileSize() {
-        return fileSize;
-    }
-
-    public void setFileSize(String fileSize) {
-        this.fileSize = fileSize;
-    }
-
-    public String getFileType() {
-        return fileType;
-    }
-
-    public void setFileType(String fileType) {
-        this.fileType = fileType;
-    }
-
-    public String getUploadStatus() {
-        return uploadStatus;
-    }
-
-    public void setUploadStatus(String uploadStatus) {
-        this.uploadStatus = uploadStatus;
-    }
-
-    public Date getRegDate() {
-        return regDate;
-    }
-
-    public void setRegDate(Date regDate) {
-        this.regDate = regDate;
-    }
-
-    public Boolean getStarred() {
-        return starred;
-    }
-
-    public void setStarred(Boolean starred) {
-        this.starred = starred;
-    }
-
-    public File getFile() {
-        return file;
-    }
-
-    public void setFile(File file) {
-        this.file = file;
-    }
-
-    public void Upload() {}
 }

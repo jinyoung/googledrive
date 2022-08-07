@@ -36,8 +36,11 @@ logging:
   level:
     org.hibernate.type: trace
     org.springframework.cloud: debug
+
+
 server:
   port: 8082
+
 ---
 
 spring:
@@ -63,3 +66,5 @@ spring:
         event-out:
           destination: google.drive
           contentType: application/json
+
+
